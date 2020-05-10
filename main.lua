@@ -15,7 +15,6 @@ ball.radius = 6
 ball.stick = false
 ball.vy = 0
 ball.vx = 0
-ball.up = true
 
 local brique = {}
 
@@ -23,7 +22,6 @@ vie = 3
 
 function DemarreJeu()
     ball.stick = true
-    ball.up = true
     ball.vy = 0
     ball.vx = 0
   end
@@ -38,13 +36,34 @@ function love.load()
     
   niveau = {}
   local l,c
-    
+  local m = 0
+  local r = 0
+  
   for l=1,6 do
     niveau[l] = {}
     for c=1,15 do
       niveau[l][c] = 1
+      m = m+1
+      if m == 13 then
+        m=0
+        niveau[l][c] = niveau[l][c] + 1
+      end
+      if m > 13 then
+        m = m-2
+      end
+      r = r + 2
+       if r > 31 then
+        r = r -1
+      end
+      if r == 33 then
+        r = r - 2*m
+        niveau[l][c] = niveau[l][c] + 1
+      end
     end
+    m = m + 1
+    r = r - 1
   end
+  
 end
   
   function love.update(dt)
@@ -71,20 +90,17 @@ end
     -- Balle collée
     if ball.stick == true then 
       ball.x = pad.x + pad.largeur/2
-      ball.y = pad.y - (ball.radius*1.5 + 3)
+      ball.y = pad.y - (ball.radius*1.5 + 8)
     else ball.x = ball.vx*dt + ball.x
-      if ball.up == true then
-        if ball.y - ball.radius < 0 then
-        ball.up = false
-        end
-      ball.y = ball.y - ball.vy*dt
+      if ball.vy > 0 and ball.y + ball.radius < 0 then
+        ball.vy = -ball.vy
       else ball.y = ball.y + ball.vy*dt 
       end
     end
     
     -- Collision Raquette
     if ball.y + ball.radius > pad.y - 3 and ball.y + ball.radius < pad.y + 6 and pad.x - 3 < ball.x and ball.x < pad.x + pad.largeur + 3 then
-      ball.up = true
+      ball.vy = -ball.vy
       local b
       for b = 0,9 do
         if ball.x > pad.x - 3 + 8*b and ball.x < pad.x + 5 +8*b then
@@ -93,8 +109,12 @@ end
       end
     end
     
-       
     --Collision plafond
+    if ball.y - ball.radius < 0 then
+      ball.vy = - ball.vy
+    end
+    
+    --Perte de vie
     if ball.y - ball.radius > hauteur then
       vie = vie - 1
         if vie > 0 then
@@ -106,9 +126,9 @@ end
     local l = math.floor ((ball.y - ball.radius) / brique.hauteur) + 1
     -- Check si les briques sont cassées
     if l > 0 and l < 7 and  c>0 and c <= 15 then
-      if niveau[l][c] == 1 then
-        niveau[l][c] = 0
-        ball.up = false
+      if niveau[l][c] >0 then
+        niveau[l][c] = niveau[l][c] -1
+        ball.vy = -ball.vy
       end
     end
     
@@ -127,11 +147,16 @@ function love.draw()
     bx = 0
     for c=1,15 do
       if niveau[l][c] == 1 then
-        love.graphics.rectangle("fill", bx + 3, by + 3, brique.largeur - 6, brique.hauteur - 6)
+        love.graphics.rectangle("fill", bx + 8, by + 8, brique.largeur - 16, brique.hauteur - 16)
         love.graphics.rectangle("line", bx, by, brique.largeur, brique.hauteur)
-      else if ball.y < 160 then 
-        end
       end
+      if niveau[l][c] == 2 then
+          love.graphics.rectangle("fill", bx + 4, by + 4, brique.largeur - 8, brique.hauteur - 8)
+          love.graphics.rectangle("line", bx, by, brique.largeur, brique.hauteur)
+        end
+      if niveau[l][c] == 3 then
+          love.graphics.rectangle("fill", bx, by, brique.largeur, brique.hauteur)
+        end
       bx = bx + brique.largeur
     end
   by = by + brique.hauteur
@@ -150,7 +175,7 @@ end
     if ball.stick == true then
     ball.stick = false
     ball.vx = 200
-    ball.vy = 330
+    ball.vy = -330
     end
   end
   
