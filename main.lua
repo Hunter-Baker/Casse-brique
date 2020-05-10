@@ -101,7 +101,7 @@ end
     end
     
     -- Collision Raquette
-    if ball.y + ball.radius > pad.y - 3 and ball.y + ball.radius < pad.y + 6 and pad.x - 3 < ball.x and ball.x < pad.x + pad.largeur + 3 then
+   if ball.y + ball.radius > pad.y - 3 and ball.y + ball.radius < pad.y - 3 + ball.vy*dt and pad.x - 3 < ball.x and ball.x < pad.x + pad.largeur + 3 then
       ball.vy = -ball.vy
       local b
       for b = 0,9 do
