@@ -31,6 +31,8 @@ function love.load()
   hauteur = love.graphics.getHeight()
   brique.hauteur = 25
   brique.largeur = largeur / 15
+    
+    a = 0
    
   DemarreJeu()
     
@@ -135,6 +137,12 @@ end
   end
   
 function love.draw()
+    
+    if a < 120 then
+    love.graphics.print('Start', largeur/2 - 13, hauteur/2)
+    a = a + 1
+    end
+    
     love.graphics.rectangle("fill", pad.x, pad.y, pad.largeur, pad.hauteur)
     love.graphics.rectangle("line", pad.x - 3, pad.y - 3, pad.largeur + 6, pad.hauteur + 6)
     love.graphics.circle("fill", ball.x, ball.y, ball.radius)
@@ -172,6 +180,7 @@ function love.draw()
 end
     
   function love.mousepressed(x,y,n)
+    a=200
     if ball.stick == true then
     ball.stick = false
     ball.vx = 200
